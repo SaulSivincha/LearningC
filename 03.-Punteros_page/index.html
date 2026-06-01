@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curso dinamico de punteros en C</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">C*</span>
+        <div>
+          <strong>Punteros en C</strong>
+          <span>De cero a lectura experta de memoria.</span>
+        </div>
+      </div>
+
+      <label class="search-box">
+        <span>Buscar</span>
+        <input id="searchInput" type="search" placeholder="NULL, matriz, char*, malloc...">
+      </label>
+
+      <nav id="nav" class="nav-list" aria-label="Temario"></nav>
+
+      <div class="sidebar-footer">
+        <a href="guia_original.html">Ver guia original</a>
+        <span>Version modular: HTML + CSS + JS + datos.</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="hero" id="inicio">
+        <div class="hero-copy">
+          <p class="eyebrow">Laboratorio interactivo</p>
+          <h1>Domina punteros en C viendo como se mueve la memoria</h1>
+          <p>Esta version amplia la guia anterior con animaciones, laboratorios, arreglos bidimensionales, punteros dobles, strings, funciones, <code>void *</code>, <code>const</code>, structs, memoria dinamica y punteros a funciones.</p>
+          <div class="hero-actions">
+            <button class="btn primary" data-jump="#lab-basico">Empezar con memoria</button>
+            <button class="btn" data-jump="#matrices">Ir a matrices 2D</button>
+            <button class="btn" data-jump="#ejercicios">Practicas</button>
+          </div>
+        </div>
+        <div class="hero-board" aria-label="Animacion de punteros">
+          <div class="stack-card var-card">
+            <span class="label">int edad</span>
+            <strong id="heroValue">20</strong>
+            <small>0x1000</small>
+          </div>
+          <div class="wire wire-one"></div>
+          <div class="stack-card ptr-card">
+            <span class="label">int *p</span>
+            <strong>0x1000</strong>
+            <small>*p == edad</small>
+          </div>
+          <div class="pulse-dot"></div>
+        </div>
+      </header>
+
+      <div class="status-strip">
+        <div>
+          <strong id="readPercent">0%</strong>
+          <span>avance de lectura</span>
+        </div>
+        <div>
+          <strong>26</strong>
+          <span>modulos de punteros</span>
+        </div>
+        <div>
+          <strong>14</strong>
+          <span>ejemplos C compilables</span>
+        </div>
+      </div>
+
+      <div id="content" class="content"></div>
+    </main>
+  </div>
+
+  <script src="data/sections.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

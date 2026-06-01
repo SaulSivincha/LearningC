@@ -1,0 +1,1967 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guia dinamica de C: sintaxis, strings y punteros</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-2: #eef3f8;
+      --text: #17202a;
+      --muted: #5d6b7a;
+      --line: #d8e1ea;
+      --code: #101820;
+      --code-2: #162536;
+      --blue: #2357c6;
+      --green: #147a55;
+      --orange: #a45212;
+      --red: #b42318;
+      --teal: #087f8c;
+      --focus: #111827;
+      --shadow: 0 16px 40px rgba(16, 24, 40, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 292px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 22px 18px;
+      border-right: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .brand {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 18px;
+    }
+
+    .brand strong {
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .search {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding-bottom: 14px;
+      background: #fbfcfe;
+    }
+
+    .search input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+    }
+
+    .search input:focus {
+      outline: 2px solid rgba(35, 87, 198, 0.18);
+      border-color: var(--blue);
+    }
+
+    nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    nav a {
+      display: block;
+      border-radius: 8px;
+      color: var(--text);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav a:hover,
+    nav a.active {
+      background: #e8eef9;
+      color: #123a8c;
+    }
+
+    main {
+      min-width: 0;
+      padding: 28px 32px 54px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 auto 20px;
+      max-width: 1180px;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .topbar p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      padding: 9px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: #b9c7d8;
+      background: #f7faff;
+    }
+
+    .btn.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: #1c49aa;
+    }
+
+    .content {
+      display: grid;
+      gap: 18px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+
+    section > header {
+      border-bottom: 1px solid var(--line);
+      padding: 18px 20px;
+      background: linear-gradient(180deg, #fff, #fbfcff);
+    }
+
+    section > header h2 {
+      margin: 0;
+      font-size: 23px;
+      letter-spacing: 0;
+    }
+
+    section > header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .body {
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .panel h3,
+    .panel h4 {
+      margin: 0 0 8px;
+      letter-spacing: 0;
+    }
+
+    .panel p,
+    .panel li {
+      color: var(--muted);
+    }
+
+    .panel p:last-child,
+    .panel ul:last-child,
+    .panel ol:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout {
+      border-left: 4px solid var(--blue);
+      background: #f2f6ff;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin: 14px 0;
+    }
+
+    .callout.warn {
+      border-color: var(--orange);
+      background: #fff7ed;
+    }
+
+    .callout.good {
+      border-color: var(--green);
+      background: #edfdf6;
+    }
+
+    .callout.danger {
+      border-color: var(--red);
+      background: #fff1f0;
+    }
+
+    .callout p {
+      margin: 0;
+      color: var(--text);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      background: #eef3f8;
+      color: #334155;
+      font-size: 12px;
+      border: 1px solid #dbe4ee;
+    }
+
+    .tag.green {
+      background: #e8f8f1;
+      color: #0c5f43;
+      border-color: #c6ebdc;
+    }
+
+    .tag.orange {
+      background: #fff1dd;
+      color: #8c3f0c;
+      border-color: #ffd7a6;
+    }
+
+    .tag.red {
+      background: #fff1f0;
+      color: #9d1c13;
+      border-color: #ffd0cc;
+    }
+
+    .codebox {
+      position: relative;
+      margin: 12px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #26384e;
+      background: var(--code);
+    }
+
+    .codebox .label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 38px;
+      padding: 8px 10px;
+      background: var(--code-2);
+      color: #d7e4f2;
+      font-size: 13px;
+      border-bottom: 1px solid #26384e;
+    }
+
+    .copy {
+      border: 1px solid #4d637a;
+      background: #203348;
+      color: #fff;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .copy:hover {
+      background: #29435f;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      color: #e6edf3;
+      font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.95em;
+    }
+
+    :not(pre) > code {
+      background: #eef3f8;
+      border: 1px solid #dce5ee;
+      border-radius: 5px;
+      padding: 1px 5px;
+      color: #102033;
+    }
+
+    .syntax-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: table;
+    }
+
+    .syntax-table th,
+    .syntax-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .syntax-table th {
+      background: #f4f7fb;
+      color: #243244;
+    }
+
+    .syntax-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 11px;
+      cursor: pointer;
+    }
+
+    .tab[aria-selected="true"] {
+      background: #e8eef9;
+      color: #123a8c;
+      border-color: #b8c8e6;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: clip;
+    }
+
+    details + details {
+      margin-top: 10px;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 12px 14px;
+      font-weight: 650;
+      background: #f7faff;
+    }
+
+    details[open] summary {
+      border-bottom: 1px solid var(--line);
+    }
+
+    details .inside {
+      padding: 14px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      counter-reset: step;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #e8eef9;
+      color: #123a8c;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .memory-lab {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .memory-controls {
+      display: grid;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .memory-controls label {
+      display: grid;
+      gap: 6px;
+      font-weight: 650;
+      color: #243244;
+    }
+
+    .memory-controls input[type="range"] {
+      width: 100%;
+    }
+
+    .memory-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(82px, 1fr));
+      gap: 8px;
+    }
+
+    .cell {
+      min-height: 94px;
+      border: 2px solid #c9d6e3;
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px;
+      position: relative;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+      text-align: center;
+      transition: 140ms ease;
+    }
+
+    .cell.active {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(35, 87, 198, 0.14);
+      background: #f4f7ff;
+    }
+
+    .cell .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #102033;
+    }
+
+    .cell .addr,
+    .cell .expr {
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .arrow-note {
+      margin-top: 10px;
+      border: 1px dashed #b9c7d8;
+      background: #fbfdff;
+      border-radius: 8px;
+      padding: 10px;
+      color: #243244;
+    }
+
+    .quiz {
+      display: grid;
+      gap: 12px;
+    }
+
+    .question {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .question h4 {
+      margin: 0 0 10px;
+    }
+
+    .question button {
+      margin: 4px 6px 4px 0;
+    }
+
+    .answer {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .answer.ok {
+      display: block;
+      background: #edfdf6;
+      border: 1px solid #bde8d5;
+      color: #0c5f43;
+    }
+
+    .answer.no {
+      display: block;
+      background: #fff1f0;
+      border: 1px solid #ffd0cc;
+      color: #9d1c13;
+    }
+
+    .progress {
+      height: 8px;
+      border-radius: 999px;
+      background: #dce5ee;
+      overflow: hidden;
+      margin: 16px 0 0;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      transition: width 180ms ease;
+    }
+
+    .hidden-by-search {
+      display: none;
+    }
+
+    .mini-index {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
+    }
+
+    .mini-index a {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .mini-index a:hover {
+      border-color: #b8c8e6;
+      background: #f7faff;
+    }
+
+    .mini-index strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .mini-index span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        position: relative;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      nav {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+
+      main {
+        padding: 22px 16px 44px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .grid.two,
+      .grid.three,
+      .memory-lab {
+        grid-template-columns: 1fr;
+      }
+
+      .memory-row {
+        grid-template-columns: repeat(5, minmax(60px, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .memory-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .syntax-table,
+      .syntax-table thead,
+      .syntax-table tbody,
+      .syntax-table th,
+      .syntax-table td,
+      .syntax-table tr {
+        display: block;
+      }
+
+      .syntax-table thead {
+        display: none;
+      }
+
+      .syntax-table tr {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .syntax-table td {
+        border-bottom: 0;
+      }
+
+      .syntax-table td::before {
+        content: attr(data-label);
+        display: block;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <strong>C desde tus archivos</strong>
+        <span>Hola mundo, variables, entradas, operaciones, condicionales, strings y punteros.</span>
+      </div>
+      <div class="search">
+        <input id="search" type="search" placeholder="Buscar tema: scanf, puntero, strcmp...">
+      </div>
+      <nav id="nav">
+        <a href="#inicio">Inicio</a>
+        <a href="#mapa">Mapa de avance</a>
+        <a href="#estructura">Estructura base</a>
+        <a href="#variables">Variables y tipos</a>
+        <a href="#printf">printf y formato</a>
+        <a href="#scanf">scanf y entradas</a>
+        <a href="#operadores">Operadores</a>
+        <a href="#condicionales">Condicionales</a>
+        <a href="#strings">Strings</a>
+        <a href="#arreglos">Arreglos</a>
+        <a href="#bucles">Bucles</a>
+        <a href="#punteros">Punteros</a>
+        <a href="#memoria">Laboratorio de memoria</a>
+        <a href="#errores">Errores de tus archivos</a>
+        <a href="#ejercicios">Practicas</a>
+        <a href="#quiz">Quiz rapido</a>
+        <a href="#fuentes">Fuentes</a>
+      </nav>
+    </aside>
+
+    <main>
+      <div class="topbar" id="inicio">
+        <div>
+          <h1>Guia dinamica de sintaxis C y punteros</h1>
+          <p>Esta guia esta hecha a partir de los ejercicios que tienes en este directorio: del primer <code>printf</code> hasta arreglos, strings y el inicio real de punteros.</p>
+          <div class="meta">
+            <span class="tag green">Basado en tus archivos 1 al 7</span>
+            <span class="tag">HTML autocontenido</span>
+            <span class="tag orange">Con correcciones practicas</span>
+          </div>
+          <div class="progress" aria-label="Progreso de lectura"><span id="readProgress"></span></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="expandAll">Abrir detalles</button>
+          <button class="btn" id="collapseAll">Cerrar detalles</button>
+          <button class="btn primary" onclick="window.print()">Imprimir / PDF</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <section id="mapa" data-search="avance ejercicios hola mundo variables entradas operaciones condicionales strings punteros">
+          <header>
+            <h2>Mapa de avance</h2>
+            <p>Lo que ya tocaste en tus archivos y como se conecta con punteros.</p>
+          </header>
+          <div class="body">
+            <div class="mini-index">
+              <a href="#estructura"><strong>1. Hola mundo</strong><span><code>#include</code>, <code>main</code>, <code>printf</code>, <code>return 0</code>.</span></a>
+              <a href="#variables"><strong>2. Variables</strong><span><code>int</code>, <code>double</code>, <code>char[]</code>, asignacion e impresion.</span></a>
+              <a href="#scanf"><strong>3. Entradas</strong><span><code>scanf</code>, formatos y operador direccion <code>&amp;</code>.</span></a>
+              <a href="#operadores"><strong>4. Operaciones</strong><span>Suma, resta, multiplicacion, division entera y precedencia.</span></a>
+              <a href="#condicionales"><strong>5. Condicionales</strong><span><code>if</code>, <code>else</code>, comparadores y logica booleana.</span></a>
+              <a href="#strings"><strong>6. Strings</strong><span><code>&lt;string.h&gt;</code>, <code>strlen</code>, <code>strcmp</code>, buffers.</span></a>
+              <a href="#punteros"><strong>7. Punteros</strong><span>Direcciones, <code>*</code>, arreglos, aritmetica de punteros.</span></a>
+            </div>
+            <div class="callout good">
+              <p>La idea clave: ya usaste punteros sin llamarlos asi cuando escribiste <code>scanf("%d", &amp;edad)</code>. Ese <code>&amp;edad</code> entrega la direccion de memoria donde <code>scanf</code> debe guardar el numero.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="estructura" data-search="estructura include stdio main return llaves punto coma programa completo">
+          <header>
+            <h2>Estructura base de un programa C</h2>
+            <p>Todo programa C ejecutable necesita una funcion de entrada, normalmente <code>main</code>.</p>
+          </header>
+          <div class="body">
+            <div class="grid two">
+              <div>
+                <p>Tu archivo <code>1.HolaMundo.c</code> contiene la forma minima para imprimir en pantalla.</p>
+                <div class="codebox">
+                  <div class="label"><span>1.HolaMundo.c</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    printf("Hola mundo");
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3>Lectura linea por linea</h3>
+                <ul>
+                  <li><code>#include &lt;stdio.h&gt;</code>: pide declaraciones de entrada/salida estandar, como <code>printf</code> y <code>scanf</code>.</li>
+                  <li><code>int main()</code>: funcion donde empieza el programa. Retorna un entero al sistema operativo.</li>
+                  <li><code>{ ... }</code>: bloque de instrucciones.</li>
+                  <li><code>printf(...);</code>: llamada a funcion. La instruccion termina con <code>;</code>.</li>
+                  <li><code>return 0;</code>: final correcto del programa.</li>
+                </ul>
+              </div>
+            </div>
+
+            <table class="syntax-table">
+              <thead>
+                <tr>
+                  <th>Sintaxis</th>
+                  <th>Significado</th>
+                  <th>Ejemplo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Sintaxis"><code>#include &lt;archivo.h&gt;</code></td>
+                  <td data-label="Significado">Incluye declaraciones de una biblioteca.</td>
+                  <td data-label="Ejemplo"><code>#include &lt;stdio.h&gt;</code></td>
+                </tr>
+                <tr>
+                  <td data-label="Sintaxis"><code>tipo nombre(...)</code></td>
+                  <td data-label="Significado">Declara una funcion.</td>
+                  <td data-label="Ejemplo"><code>int main()</code></td>
+                </tr>
+                <tr>
+                  <td data-label="Sintaxis"><code>{ }</code></td>
+                  <td data-label="Significado">Agrupa instrucciones en un bloque.</td>
+                  <td data-label="Ejemplo"><code>if (edad &gt;= 18) { ... }</code></td>
+                </tr>
+                <tr>
+                  <td data-label="Sintaxis"><code>;</code></td>
+                  <td data-label="Significado">Cierra una sentencia simple.</td>
+                  <td data-label="Ejemplo"><code>int edad = 20;</code></td>
+                </tr>
+                <tr>
+                  <td data-label="Sintaxis"><code>//</code> y <code>/* */</code></td>
+                  <td data-label="Significado">Comentarios ignorados por el compilador.</td>
+                  <td data-label="Ejemplo"><code>// una linea</code></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <details>
+              <summary>Como compilar y ejecutar</summary>
+              <div class="inside">
+                <p>Con GCC, el patron recomendado para tus ejercicios es este:</p>
+                <div class="codebox">
+                  <div class="label"><span>Terminal</span><button class="copy">Copiar</button></div>
+                  <pre><code>gcc -Wall -Wextra -std=c17 1.HolaMundo.c -o 1.HolaMundo
+./1.HolaMundo</code></pre>
+                </div>
+                <p><code>-Wall -Wextra</code> activa advertencias utiles. No son decoracion: en C, muchas advertencias avisan errores reales de tipos, memoria o formato.</p>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <section id="variables" data-search="variables tipos int double char char array declaracion inicializacion asignacion sizeof">
+          <header>
+            <h2>Variables y tipos</h2>
+            <p>Una variable es una zona de memoria con nombre, tipo y valor.</p>
+          </header>
+          <div class="body">
+            <div class="grid two">
+              <div>
+                <div class="codebox">
+                  <div class="label"><span>2.Variables.c</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int edad = 20;
+    char nombre[] = "Saul";
+    double estatura = 1.71;
+
+    printf("%d", edad);
+    printf("%.2f", estatura);
+    printf("%s", nombre);
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3>Partes de una variable</h3>
+                <ul>
+                  <li><code>int edad = 20;</code>: entero.</li>
+                  <li><code>double estatura = 1.71;</code>: numero real de doble precision.</li>
+                  <li><code>char nombre[] = "Saul";</code>: arreglo de caracteres terminado en <code>'\0'</code>.</li>
+                  <li><code>=</code>: asignacion, no comparacion.</li>
+                </ul>
+              </div>
+            </div>
+
+            <table class="syntax-table">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Uso comun</th>
+                  <th>Formato con printf</th>
+                  <th>Formato con scanf</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Tipo"><code>int</code></td>
+                  <td data-label="Uso comun">Enteros: edad, cantidad, indice.</td>
+                  <td data-label="printf"><code>%d</code></td>
+                  <td data-label="scanf"><code>%d</code> con <code>&amp;variable</code></td>
+                </tr>
+                <tr>
+                  <td data-label="Tipo"><code>double</code></td>
+                  <td data-label="Uso comun">Decimales: estatura, promedio.</td>
+                  <td data-label="printf"><code>%f</code>, <code>%.2f</code></td>
+                  <td data-label="scanf"><code>%lf</code> con <code>&amp;variable</code></td>
+                </tr>
+                <tr>
+                  <td data-label="Tipo"><code>char</code></td>
+                  <td data-label="Uso comun">Un caracter.</td>
+                  <td data-label="printf"><code>%c</code></td>
+                  <td data-label="scanf"><code> %c</code> con <code>&amp;variable</code></td>
+                </tr>
+                <tr>
+                  <td data-label="Tipo"><code>char[]</code></td>
+                  <td data-label="Uso comun">String guardado en arreglo.</td>
+                  <td data-label="printf"><code>%s</code></td>
+                  <td data-label="scanf"><code>%29s</code> sin <code>&amp;</code> si el buffer es <code>char nombre[30]</code></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="callout">
+              <p><code>sizeof(variable)</code> devuelve cuantos bytes ocupa ese objeto en memoria. En arreglos sirve para calcular cantidad de elementos, pero en punteros devuelve el tamano del puntero, no del arreglo original.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="printf" data-search="printf formato salida %d %f %.2f %s %c %p barra n">
+          <header>
+            <h2>printf y cadenas de formato</h2>
+            <p><code>printf</code> imprime texto normal y valores formateados.</p>
+          </header>
+          <div class="body">
+            <div class="tabs" role="tablist" aria-label="Ejemplos de printf">
+              <button class="tab" role="tab" aria-selected="true" data-tab="printf-basico">Basico</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="printf-formatos">Formatos</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="printf-errores">Errores</button>
+            </div>
+
+            <div id="printf-basico" class="tab-panel active" role="tabpanel">
+              <p>El primer argumento de <code>printf</code> es una cadena de formato. Los caracteres normales salen tal cual. Las conversiones empiezan con <code>%</code>.</p>
+              <div class="codebox">
+                <div class="label"><span>Salida formateada</span><button class="copy">Copiar</button></div>
+                <pre><code>int edad = 20;
+double estatura = 1.71;
+char nombre[] = "Saul";
+
+printf("Nombre: %s\n", nombre);
+printf("Edad: %d\n", edad);
+printf("Estatura: %.2f\n", estatura);</code></pre>
+              </div>
+            </div>
+
+            <div id="printf-formatos" class="tab-panel" role="tabpanel">
+              <table class="syntax-table">
+                <thead>
+                  <tr>
+                    <th>Formato</th>
+                    <th>Tipo esperado</th>
+                    <th>Ejemplo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-label="Formato"><code>%d</code></td>
+                    <td data-label="Tipo esperado"><code>int</code></td>
+                    <td data-label="Ejemplo"><code>printf("%d", edad);</code></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Formato"><code>%f</code></td>
+                    <td data-label="Tipo esperado"><code>double</code> en <code>printf</code></td>
+                    <td data-label="Ejemplo"><code>printf("%f", estatura);</code></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Formato"><code>%.2f</code></td>
+                    <td data-label="Tipo esperado"><code>double</code>, con 2 decimales visibles</td>
+                    <td data-label="Ejemplo"><code>printf("%.2f", 1.714);</code></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Formato"><code>%s</code></td>
+                    <td data-label="Tipo esperado"><code>char *</code> apuntando a string terminado en <code>'\0'</code></td>
+                    <td data-label="Ejemplo"><code>printf("%s", nombre);</code></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Formato"><code>%c</code></td>
+                    <td data-label="Tipo esperado"><code>int</code> que representa un caracter</td>
+                    <td data-label="Ejemplo"><code>printf("%c", inicial);</code></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Formato"><code>%p</code></td>
+                    <td data-label="Tipo esperado"><code>void *</code>, una direccion</td>
+                    <td data-label="Ejemplo"><code>printf("%p", (void *)&amp;edad);</code></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Formato"><code>%%</code></td>
+                    <td data-label="Tipo esperado">Ningun argumento</td>
+                    <td data-label="Ejemplo"><code>printf("100%%");</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="printf-errores" class="tab-panel" role="tabpanel">
+              <div class="callout danger">
+                <p>En C, el formato y el tipo deben coincidir. Si escribes <code>printf("%d", estatura)</code>, el compilador puede advertirlo y el programa puede imprimir basura.</p>
+              </div>
+              <div class="codebox">
+                <div class="label"><span>Mal vs bien</span><button class="copy">Copiar</button></div>
+                <pre><code>double estatura = 1.71;
+
+printf("%d\n", estatura);     // mal: %d espera int
+printf("%.2f\n", estatura);   // bien: %.2f imprime double con 2 decimales</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="scanf" data-search="scanf entrada leer stdin & direccion retorno validar %d %s ancho buffer">
+          <header>
+            <h2>scanf y entradas</h2>
+            <p><code>scanf</code> lee datos desde la entrada estandar y necesita direcciones donde guardar.</p>
+          </header>
+          <div class="body">
+            <div class="grid two">
+              <div>
+                <div class="codebox">
+                  <div class="label"><span>3.Leer_Entradas.c mejorado</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int edad;
+
+    printf("Escribe tu edad: ");
+
+    if (scanf("%d", &amp;edad) != 1) {
+        printf("Entrada invalida\n");
+        return 1;
+    }
+
+    printf("Tu edad es %d\n", edad);
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3>Por que va <code>&amp;edad</code></h3>
+                <p><code>edad</code> es el valor. <code>&amp;edad</code> es la direccion donde vive ese valor. <code>scanf</code> no puede modificar tu variable si solo le das una copia del valor; necesita saber donde escribir.</p>
+                <p>Esta es la puerta de entrada a punteros.</p>
+              </div>
+            </div>
+
+            <details>
+              <summary>Reglas practicas de scanf</summary>
+              <div class="inside">
+                <ul>
+                  <li>Para <code>int</code>: <code>scanf("%d", &amp;edad)</code>.</li>
+                  <li>Para <code>double</code>: <code>scanf("%lf", &amp;estatura)</code>.</li>
+                  <li>Para <code>char</code>: <code>scanf(" %c", &amp;letra)</code>. El espacio antes de <code>%c</code> consume saltos de linea pendientes.</li>
+                  <li>Para <code>char nombre[30]</code>: <code>scanf("%29s", nombre)</code>. No uses <code>&amp;nombre</code> con <code>%s</code>.</li>
+                  <li>Verifica el retorno: si querias leer 1 dato, espera que retorne <code>1</code>.</li>
+                </ul>
+              </div>
+            </details>
+
+            <div class="callout warn">
+              <p><code>scanf("%s", nombre)</code> lee hasta el primer espacio. Para nombres con espacios, conviene <code>fgets</code>. Para aprender punteros esta bien usar <code>scanf</code>, pero con ancho maximo: <code>%29s</code> si el buffer mide 30.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="operadores" data-search="operadores suma resta multiplicacion division modulo precedencia incremento i++ asignacion comparacion">
+          <header>
+            <h2>Operadores</h2>
+            <p>Los operadores combinan valores. Algunos producen numeros, otros producen verdadero/falso.</p>
+          </header>
+          <div class="body">
+            <div class="grid two">
+              <div>
+                <div class="codebox">
+                  <div class="label"><span>4.Operaciones_Matematicas.c mejorado</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int a;
+    int b;
+
+    printf("Ingresa el primer numero: ");
+    scanf("%d", &amp;a);
+
+    printf("Ingresa el segundo numero: ");
+    scanf("%d", &amp;b);
+
+    printf("Suma: %d\n", a + b);
+    printf("Resta: %d\n", a - b);
+    printf("Multiplicacion: %d\n", a * b);
+
+    if (b != 0) {
+        printf("Division entera: %d\n", a / b);
+        printf("Residuo: %d\n", a % b);
+    } else {
+        printf("No se puede dividir entre cero\n");
+    }
+
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3>Tabla rapida</h3>
+                <table class="syntax-table">
+                  <thead>
+                    <tr><th>Operador</th><th>Uso</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td data-label="Operador"><code>+</code></td><td data-label="Uso">Suma.</td></tr>
+                    <tr><td data-label="Operador"><code>-</code></td><td data-label="Uso">Resta o signo negativo.</td></tr>
+                    <tr><td data-label="Operador"><code>*</code></td><td data-label="Uso">Multiplicacion. Tambien dereferencia en punteros.</td></tr>
+                    <tr><td data-label="Operador"><code>/</code></td><td data-label="Uso">Division. Si ambos son <code>int</code>, el resultado es entero.</td></tr>
+                    <tr><td data-label="Operador"><code>%</code></td><td data-label="Uso">Residuo de division entera.</td></tr>
+                    <tr><td data-label="Operador"><code>++</code></td><td data-label="Uso">Incremento: <code>i++</code>.</td></tr>
+                    <tr><td data-label="Operador"><code>--</code></td><td data-label="Uso">Decremento: <code>i--</code>.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="callout">
+              <p>En <code>int a = 7; int b = 2;</code>, <code>a / b</code> da <code>3</code>, no <code>3.5</code>. Para decimales, al menos uno debe ser <code>double</code>: <code>(double)a / b</code>.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="condicionales" data-search="if else else if comparadores == != mayor menor && || ! booleano">
+          <header>
+            <h2>Condicionales</h2>
+            <p><code>if</code> ejecuta un bloque solo si una condicion es verdadera.</p>
+          </header>
+          <div class="body">
+            <div class="grid two">
+              <div>
+                <div class="codebox">
+                  <div class="label"><span>5.Condicionales.c mejorado</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int edad;
+
+    printf("Ingresa tu edad: ");
+    scanf("%d", &amp;edad);
+
+    if (edad &lt; 18) {
+        printf("Eres menor de edad\n");
+    } else if (edad == 40) {
+        printf("Estas en la crisis de los 40\n");
+    } else {
+        printf("Tu edad es: %d\n", edad);
+    }
+
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3>Comparadores</h3>
+                <table class="syntax-table">
+                  <thead>
+                    <tr><th>Operador</th><th>Significado</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td data-label="Operador"><code>==</code></td><td data-label="Significado">Igualdad.</td></tr>
+                    <tr><td data-label="Operador"><code>!=</code></td><td data-label="Significado">Diferente.</td></tr>
+                    <tr><td data-label="Operador"><code>&lt;</code></td><td data-label="Significado">Menor que.</td></tr>
+                    <tr><td data-label="Operador"><code>&gt;</code></td><td data-label="Significado">Mayor que.</td></tr>
+                    <tr><td data-label="Operador"><code>&lt;=</code></td><td data-label="Significado">Menor o igual.</td></tr>
+                    <tr><td data-label="Operador"><code>&gt;=</code></td><td data-label="Significado">Mayor o igual.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <details>
+              <summary>Logica con <code>&amp;&amp;</code>, <code>||</code> y <code>!</code></summary>
+              <div class="inside">
+                <ul>
+                  <li><code>a &amp;&amp; b</code>: verdadero solo si ambas condiciones son verdaderas.</li>
+                  <li><code>a || b</code>: verdadero si al menos una condicion es verdadera.</li>
+                  <li><code>!a</code>: niega una condicion.</li>
+                </ul>
+                <div class="codebox">
+                  <div class="label"><span>Condicion compuesta</span><button class="copy">Copiar</button></div>
+                  <pre><code>if (edad &gt;= 18 &amp;&amp; edad &lt;= 65) {
+    printf("Edad laboral comun\n");
+}</code></pre>
+                </div>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <section id="strings" data-search="strings char array string.h strlen strcmp fgets scanf %s null terminator barra cero">
+          <header>
+            <h2>Strings</h2>
+            <p>En C, un string no es un tipo especial: normalmente es un arreglo de <code>char</code> terminado en <code>'\0'</code>.</p>
+          </header>
+          <div class="body">
+            <div class="grid two">
+              <div>
+                <div class="codebox">
+                  <div class="label"><span>6.Strings.c corregido</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main() {
+    char nombre[30];
+
+    printf("Ingresa tu nombre: ");
+
+    if (scanf("%29s", nombre) != 1) {
+        printf("No se pudo leer el nombre\n");
+        return 1;
+    }
+
+    if (strcmp(nombre, "Daniel") == 0) {
+        printf("Hola, %s\n", nombre);
+        printf("Coincidencia exacta\n");
+    } else {
+        printf("Hola, %s\n", nombre);
+    }
+
+    printf("Tu nombre tiene %zu caracteres visibles\n", strlen(nombre));
+
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3>Conceptos clave</h3>
+                <ul>
+                  <li><code>char nombre[30]</code>: reserva espacio para hasta 29 caracteres mas <code>'\0'</code>.</li>
+                  <li><code>%29s</code>: limita la lectura para no desbordar el arreglo.</li>
+                  <li><code>strlen(nombre)</code>: cuenta bytes antes del <code>'\0'</code>.</li>
+                  <li><code>strcmp(a, b) == 0</code>: las cadenas son iguales.</li>
+                  <li><code>%zu</code>: formato correcto para imprimir <code>size_t</code>, el tipo que retorna <code>strlen</code>.</li>
+                </ul>
+              </div>
+            </div>
+
+            <details>
+              <summary>Representacion de <code>"Saul"</code> en memoria</summary>
+              <div class="inside">
+                <table class="syntax-table">
+                  <thead>
+                    <tr>
+                      <th>Indice</th>
+                      <th>0</th>
+                      <th>1</th>
+                      <th>2</th>
+                      <th>3</th>
+                      <th>4</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td data-label="Indice">Contenido</td>
+                      <td data-label="0"><code>'S'</code></td>
+                      <td data-label="1"><code>'a'</code></td>
+                      <td data-label="2"><code>'u'</code></td>
+                      <td data-label="3"><code>'l'</code></td>
+                      <td data-label="4"><code>'\0'</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>El caracter nulo no se imprime, pero marca donde termina el string. Si falta, funciones como <code>strlen</code> o <code>printf("%s")</code> seguirian leyendo memoria hasta encontrar un cero por casualidad.</p>
+              </div>
+            </details>
+
+            <div class="callout warn">
+              <p>Tu condicion original <code>strlen(nombre) &lt;= 0 &amp;&amp; strcmp(nombre, "Daniel") == 0</code> no puede cumplirse para <code>"Daniel"</code>: si el nombre es Daniel, su longitud no es 0. Para igualdad usa directamente <code>strcmp(nombre, "Daniel") == 0</code>.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="arreglos" data-search="arreglos arrays int numeros indice cantidad sizeof elementos memoria consecutiva">
+          <header>
+            <h2>Arreglos</h2>
+            <p>Un arreglo guarda varios elementos del mismo tipo en memoria consecutiva.</p>
+          </header>
+          <div class="body">
+            <div class="grid two">
+              <div>
+                <div class="codebox">
+                  <div class="label"><span>Arreglo de enteros</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int numeros[] = {10, 20, 30, 40, 50};
+    int cantidad = sizeof(numeros) / sizeof(numeros[0]);
+
+    for (int i = 0; i &lt; cantidad; i++) {
+        printf("numeros[%d] = %d\n", i, numeros[i]);
+    }
+
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3>Reglas</h3>
+                <ul>
+                  <li>Los indices empiezan en <code>0</code>.</li>
+                  <li>Si hay 5 elementos, el ultimo indice es <code>4</code>.</li>
+                  <li><code>numeros[i]</code> accede al elemento <code>i</code>.</li>
+                  <li><code>sizeof(numeros) / sizeof(numeros[0])</code> calcula elementos solo mientras <code>numeros</code> siga siendo arreglo, no puntero.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="callout">
+              <p>Los arreglos conectan directamente con punteros: en muchas expresiones, el nombre del arreglo se convierte en direccion del primer elemento. Por eso <code>int *p = numeros;</code> apunta a <code>numeros[0]</code>.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="bucles" data-search="for while do while bucles ciclos i++ recorrer arreglo">
+          <header>
+            <h2>Bucles</h2>
+            <p>Los bucles repiten instrucciones. Ya aparece un <code>for</code> en tu archivo de punteros.</p>
+          </header>
+          <div class="body">
+            <div class="grid three">
+              <div class="panel">
+                <h3><code>for</code></h3>
+                <p>Ideal cuando sabes cuantas veces repetir.</p>
+                <div class="codebox">
+                  <div class="label"><span>for</span><button class="copy">Copiar</button></div>
+                  <pre><code>for (int i = 0; i &lt; 5; i++) {
+    printf("%d\n", i);
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3><code>while</code></h3>
+                <p>Repite mientras la condicion siga siendo verdadera.</p>
+                <div class="codebox">
+                  <div class="label"><span>while</span><button class="copy">Copiar</button></div>
+                  <pre><code>int i = 0;
+while (i &lt; 5) {
+    printf("%d\n", i);
+    i++;
+}</code></pre>
+                </div>
+              </div>
+              <div class="panel">
+                <h3><code>do while</code></h3>
+                <p>Ejecuta al menos una vez.</p>
+                <div class="codebox">
+                  <div class="label"><span>do while</span><button class="copy">Copiar</button></div>
+                  <pre><code>int opcion;
+do {
+    scanf("%d", &amp;opcion);
+} while (opcion != 0);</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="punteros" data-search="punteros pointers direccion memoria & * int* dereferencia NULL aritmetica arrays char* void*">
+          <header>
+            <h2>Punteros</h2>
+            <p>Un puntero es una variable que guarda una direccion de memoria.</p>
+          </header>
+          <div class="body">
+            <div class="callout good">
+              <p>Resumen mental: <code>&amp;x</code> pregunta "donde esta x?". <code>*p</code> pregunta "que valor hay donde apunta p?".</p>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Punteros">
+              <button class="tab" role="tab" aria-selected="true" data-tab="ptr-basico">Basico</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="ptr-arreglos">Con arreglos</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="ptr-funciones">Con funciones</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="ptr-strings">Con strings</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="ptr-seguridad">Seguridad</button>
+            </div>
+
+            <div id="ptr-basico" class="tab-panel active" role="tabpanel">
+              <div class="grid two">
+                <div>
+                  <div class="codebox">
+                    <div class="label"><span>Direccion y dereferencia</span><button class="copy">Copiar</button></div>
+                    <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int edad = 20;
+    int *p = &amp;edad;
+
+    printf("edad = %d\n", edad);
+    printf("&amp;edad = %p\n", (void *)&amp;edad);
+    printf("p = %p\n", (void *)p);
+    printf("*p = %d\n", *p);
+
+    *p = 21;
+    printf("edad ahora = %d\n", edad);
+
+    return 0;
+}</code></pre>
+                  </div>
+                </div>
+                <div class="panel">
+                  <h3>Que significa cada parte</h3>
+                  <ul>
+                    <li><code>int *p</code>: <code>p</code> guarda direcciones de variables <code>int</code>.</li>
+                    <li><code>&amp;edad</code>: direccion de <code>edad</code>.</li>
+                    <li><code>p = &amp;edad</code>: el puntero apunta a <code>edad</code>.</li>
+                    <li><code>*p</code>: valor que esta en la direccion guardada en <code>p</code>.</li>
+                    <li><code>*p = 21</code>: modifica <code>edad</code> a traves de su direccion.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <table class="syntax-table">
+                <thead>
+                  <tr>
+                    <th>Codigo</th>
+                    <th>Nombre tecnico</th>
+                    <th>Idea humana</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-label="Codigo"><code>&amp;variable</code></td>
+                    <td data-label="Nombre tecnico">Operador direccion</td>
+                    <td data-label="Idea humana">Dame donde vive esta variable.</td>
+                  </tr>
+                  <tr>
+                    <td data-label="Codigo"><code>tipo *p</code></td>
+                    <td data-label="Nombre tecnico">Declaracion de puntero</td>
+                    <td data-label="Idea humana">Esta variable guarda una direccion hacia un <code>tipo</code>.</td>
+                  </tr>
+                  <tr>
+                    <td data-label="Codigo"><code>*p</code></td>
+                    <td data-label="Nombre tecnico">Dereferencia</td>
+                    <td data-label="Idea humana">Entra a la direccion y usa el valor que hay ahi.</td>
+                  </tr>
+                  <tr>
+                    <td data-label="Codigo"><code>NULL</code></td>
+                    <td data-label="Nombre tecnico">Puntero nulo</td>
+                    <td data-label="Idea humana">No apunta a ningun objeto valido.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="ptr-arreglos" class="tab-panel" role="tabpanel">
+              <p>Tu idea de <code>7.Punteros.c</code> apunta a esto: recorrer un arreglo usando un puntero.</p>
+              <div class="codebox">
+                <div class="label"><span>7.Punteros.c corregido</span><button class="copy">Copiar</button></div>
+                <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int numeros[] = {10, 20, 30, 40, 50};
+    int cantidad = sizeof(numeros) / sizeof(numeros[0]);
+
+    int *puntero = numeros;
+
+    for (int i = 0; i &lt; cantidad; i++) {
+        printf("Valor: %d | Direccion: %p\n",
+               *(puntero + i),
+               (void *)(puntero + i));
+    }
+
+    return 0;
+}</code></pre>
+              </div>
+              <div class="grid two">
+                <div class="panel">
+                  <h3>Equivalencias</h3>
+                  <table class="syntax-table">
+                    <thead>
+                      <tr><th>Con arreglo</th><th>Con puntero</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td data-label="Con arreglo"><code>numeros[0]</code></td><td data-label="Con puntero"><code>*puntero</code></td></tr>
+                      <tr><td data-label="Con arreglo"><code>numeros[i]</code></td><td data-label="Con puntero"><code>*(puntero + i)</code></td></tr>
+                      <tr><td data-label="Con arreglo"><code>&amp;numeros[i]</code></td><td data-label="Con puntero"><code>puntero + i</code></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="panel">
+                  <h3>Aritmetica de punteros</h3>
+                  <p>Si <code>puntero</code> es <code>int *</code>, entonces <code>puntero + 1</code> no avanza 1 byte. Avanza al siguiente <code>int</code>. Si un <code>int</code> ocupa 4 bytes en tu maquina, la direccion sube 4 bytes.</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="ptr-funciones" class="tab-panel" role="tabpanel">
+              <p>Los punteros permiten que una funcion modifique variables externas. Eso ya lo hace <code>scanf</code>.</p>
+              <div class="codebox">
+                <div class="label"><span>Modificar por direccion</span><button class="copy">Copiar</button></div>
+                <pre><code>#include &lt;stdio.h&gt;
+
+void cumplir_anios(int *edad) {
+    if (edad != NULL) {
+        *edad = *edad + 1;
+    }
+}
+
+int main() {
+    int edad = 20;
+
+    cumplir_anios(&amp;edad);
+
+    printf("Edad: %d\n", edad);
+    return 0;
+}</code></pre>
+              </div>
+              <div class="callout">
+                <p>Sin puntero, la funcion recibe una copia. Con puntero, recibe la direccion de la variable real.</p>
+              </div>
+            </div>
+
+            <div id="ptr-strings" class="tab-panel" role="tabpanel">
+              <div class="grid two">
+                <div class="panel">
+                  <h3><code>char nombre[] = "Saul";</code></h3>
+                  <p>Crea un arreglo modificable con copia de los caracteres.</p>
+                  <div class="codebox">
+                    <div class="label"><span>Arreglo modificable</span><button class="copy">Copiar</button></div>
+                    <pre><code>char nombre[] = "Saul";
+nombre[0] = 'P';
+printf("%s\n", nombre); // Paul</code></pre>
+                  </div>
+                </div>
+                <div class="panel">
+                  <h3><code>char *nombre = "Saul";</code></h3>
+                  <p>El puntero apunta a un literal de string. No debes modificar sus caracteres.</p>
+                  <div class="codebox">
+                    <div class="label"><span>Literal no modificable</span><button class="copy">Copiar</button></div>
+                    <pre><code>char *nombre = "Saul";
+printf("%s\n", nombre);
+
+// nombre[0] = 'P'; // no lo hagas</code></pre>
+                  </div>
+                </div>
+              </div>
+              <div class="callout warn">
+                <p>Esta diferencia importa: arreglo y puntero se parecen al imprimir con <code>%s</code>, pero no tienen las mismas reglas de almacenamiento ni modificacion.</p>
+              </div>
+            </div>
+
+            <div id="ptr-seguridad" class="tab-panel" role="tabpanel">
+              <div class="grid two">
+                <div class="panel">
+                  <h3>Errores peligrosos</h3>
+                  <ul>
+                    <li>Usar un puntero sin inicializar.</li>
+                    <li>Dereferenciar <code>NULL</code>.</li>
+                    <li>Salir del limite de un arreglo: <code>numeros[5]</code> si solo hay 5 elementos.</li>
+                    <li>Guardar la direccion de una variable local y usarla fuera de su vida.</li>
+                    <li>Confundir <code>p</code> con <code>*p</code>.</li>
+                  </ul>
+                </div>
+                <div class="panel">
+                  <h3>Habitos defensivos</h3>
+                  <ul>
+                    <li>Inicializa punteros: <code>int *p = NULL;</code>.</li>
+                    <li>Antes de <code>*p</code>, asegurate de que <code>p != NULL</code>.</li>
+                    <li>Para imprimir direcciones, usa <code>%p</code> con cast a <code>void *</code>.</li>
+                    <li>Compila con <code>-Wall -Wextra</code>.</li>
+                    <li>Usa nombres claros: <code>puntero</code>, <code>ptr</code>, <code>actual</code>, <code>inicio</code>.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="memoria" data-search="laboratorio memoria puntero arreglo direccion valor visualizacion">
+          <header>
+            <h2>Laboratorio de memoria</h2>
+            <p>Mueve el indice para ver como cambia <code>puntero + i</code>.</p>
+          </header>
+          <div class="body">
+            <div class="memory-lab">
+              <div class="memory-controls">
+                <label>
+                  Indice <span id="idxLabel">0</span>
+                  <input id="idxRange" type="range" min="0" max="4" value="0">
+                </label>
+                <div>
+                  <strong>Expresion actual</strong>
+                  <p id="exprText"><code>*(puntero + 0)</code> lee <code>10</code>.</p>
+                </div>
+                <div>
+                  <strong>Codigo equivalente</strong>
+                  <p id="equivText"><code>numeros[0]</code> es lo mismo que <code>*(puntero + 0)</code>.</p>
+                </div>
+                <div class="arrow-note" id="addrText">Si la direccion base fuera 0x1000 y cada int ocupa 4 bytes, <code>puntero + 0</code> seria 0x1000.</div>
+              </div>
+
+              <div>
+                <div class="memory-row" id="memoryRow" aria-label="Arreglo de memoria"></div>
+                <div class="codebox">
+                  <div class="label"><span>Modelo usado</span><button class="copy">Copiar</button></div>
+                  <pre><code>int numeros[] = {10, 20, 30, 40, 50};
+int *puntero = numeros;
+
+// numeros[i] == *(puntero + i)
+// &amp;numeros[i] == puntero + i</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="errores" data-search="errores correcciones strings punteros scanf nombre &nombre strcmp strlen archivo corrupto">
+          <header>
+            <h2>Errores detectados en tus archivos</h2>
+            <p>No son fracasos: son exactamente los errores que conviene entender antes de avanzar.</p>
+          </header>
+          <div class="body">
+            <details open>
+              <summary><code>6.Strings.c</code>: <code>scanf("%29s", &amp;nombre)</code></summary>
+              <div class="inside">
+                <p>Para <code>char nombre[30]</code>, el nombre del arreglo ya se convierte en direccion del primer caracter cuando se pasa a <code>scanf</code>. Usa:</p>
+                <div class="codebox">
+                  <div class="label"><span>Correccion</span><button class="copy">Copiar</button></div>
+                  <pre><code>scanf("%29s", nombre);</code></pre>
+                </div>
+                <p><code>&amp;nombre</code> tiene otro tipo: direccion del arreglo completo, no direccion de <code>char</code>. Puede parecer que funciona, pero no es la forma correcta para <code>%s</code>.</p>
+              </div>
+            </details>
+
+            <details open>
+              <summary><code>6.Strings.c</code>: condicion imposible con <code>strlen</code> y <code>strcmp</code></summary>
+              <div class="inside">
+                <div class="codebox">
+                  <div class="label"><span>Original problematico</span><button class="copy">Copiar</button></div>
+                  <pre><code>if (strlen(nombre) &lt;= 0 &amp;&amp; strcmp(nombre, "Daniel") == 0) {
+    ...
+}</code></pre>
+                </div>
+                <p>Si <code>nombre</code> es <code>"Daniel"</code>, su longitud es 6, no 0. Para comparar con Daniel:</p>
+                <div class="codebox">
+                  <div class="label"><span>Correccion</span><button class="copy">Copiar</button></div>
+                  <pre><code>if (strcmp(nombre, "Daniel") == 0) {
+    printf("Hola, %s\n", nombre);
+}</code></pre>
+                </div>
+              </div>
+            </details>
+
+            <details open>
+              <summary><code>7.Punteros.c</code>: hay texto de Bash pegado dentro del <code>for</code></summary>
+              <div class="inside">
+                <p>Tu archivo de punteros quedo mezclado con instrucciones de otro laboratorio. La version limpia para continuar con C es:</p>
+                <div class="codebox">
+                  <div class="label"><span>7.Punteros.c limpio</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int numeros[] = {10, 20, 30, 40, 50};
+    int cantidad = sizeof(numeros) / sizeof(numeros[0]);
+
+    int *puntero = numeros;
+
+    for (int i = 0; i &lt; cantidad; i++) {
+        printf("Valor: %d | Direccion: %p\n",
+               *(puntero + i),
+               (void *)(puntero + i));
+    }
+
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <section id="ejercicios" data-search="practicas ejercicios tareas punteros strings arreglos scanf">
+          <header>
+            <h2>Practicas para continuar</h2>
+            <p>Hazlas en archivos nuevos para que el aprendizaje quede ordenado.</p>
+          </header>
+          <div class="body">
+            <div class="timeline">
+              <div class="step">
+                <div class="panel">
+                  <h3><code>8.Punteros_Basico.c</code></h3>
+                  <p>Crea una variable <code>int edad</code>, un puntero <code>int *p</code>, imprime valor, direccion y valor por dereferencia. Luego cambia <code>edad</code> usando <code>*p</code>.</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="panel">
+                  <h3><code>9.Punteros_Array.c</code></h3>
+                  <p>Declara un arreglo de 5 numeros. Recorre primero con <code>numeros[i]</code> y luego con <code>*(p + i)</code>. Compara salidas.</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="panel">
+                  <h3><code>10.Cambiar_Valor_Funcion.c</code></h3>
+                  <p>Crea una funcion <code>void duplicar(int *x)</code> que cambie el valor real de una variable.</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="panel">
+                  <h3><code>11.Strings_y_Punteros.c</code></h3>
+                  <p>Recorre un string caracter por caracter usando <code>char *p = nombre;</code> y avanza hasta encontrar <code>'\0'</code>.</p>
+                </div>
+              </div>
+            </div>
+
+            <details>
+              <summary>Solucion modelo: recorrer string con puntero</summary>
+              <div class="inside">
+                <div class="codebox">
+                  <div class="label"><span>11.Strings_y_Punteros.c</span><button class="copy">Copiar</button></div>
+                  <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    char nombre[] = "Saul";
+    char *p = nombre;
+
+    while (*p != '\0') {
+        printf("Caracter: %c | Direccion: %p\n", *p, (void *)p);
+        p++;
+    }
+
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <section id="quiz" data-search="quiz preguntas repaso interactivo">
+          <header>
+            <h2>Quiz rapido</h2>
+            <p>Responde sin mirar arriba. La respuesta aparece al tocar una opcion.</p>
+          </header>
+          <div class="body">
+            <div class="quiz">
+              <div class="question" data-answer="b">
+                <h4>1. Que significa <code>&amp;edad</code>?</h4>
+                <button class="btn" data-choice="a">El valor de edad</button>
+                <button class="btn" data-choice="b">La direccion de edad</button>
+                <button class="btn" data-choice="c">Un string llamado edad</button>
+                <div class="answer"></div>
+              </div>
+
+              <div class="question" data-answer="c">
+                <h4>2. Si <code>int *p = &amp;edad;</code>, que significa <code>*p</code>?</h4>
+                <button class="btn" data-choice="a">La direccion de p</button>
+                <button class="btn" data-choice="b">El tipo de p</button>
+                <button class="btn" data-choice="c">El valor guardado donde apunta p</button>
+                <div class="answer"></div>
+              </div>
+
+              <div class="question" data-answer="a">
+                <h4>3. Para leer un <code>int edad</code> con <code>scanf</code>, cual es correcto?</h4>
+                <button class="btn" data-choice="a"><code>scanf("%d", &amp;edad);</code></button>
+                <button class="btn" data-choice="b"><code>scanf("%d", edad);</code></button>
+                <button class="btn" data-choice="c"><code>scanf("%s", &amp;edad);</code></button>
+                <div class="answer"></div>
+              </div>
+
+              <div class="question" data-answer="b">
+                <h4>4. Para comparar strings, cual expresion indica igualdad?</h4>
+                <button class="btn" data-choice="a"><code>nombre == "Daniel"</code></button>
+                <button class="btn" data-choice="b"><code>strcmp(nombre, "Daniel") == 0</code></button>
+                <button class="btn" data-choice="c"><code>strlen(nombre) == "Daniel"</code></button>
+                <div class="answer"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="fuentes" data-search="fuentes documentacion oficial ISO GNU GCC glibc">
+          <header>
+            <h2>Fuentes oficiales consultadas</h2>
+            <p>La guia se apoya en documentacion oficial y manuales GNU/GCC.</p>
+          </header>
+          <div class="body">
+            <ul>
+              <li><a href="https://www.iso.org/standard/82075.html">ISO/IEC 9899:2024, Information technology - Programming languages - C</a>: pagina del estandar actual de C.</li>
+              <li><a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/index.html">GNU C Language Manual</a>: sintaxis del lenguaje C usado con GCC.</li>
+              <li><a href="https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html">GCC manual: Invoking GCC</a>: opciones para compilar programas C.</li>
+              <li><a href="https://sourceware.org/glibc/manual/2.39/html_node/Formatted-Output-Functions.html">GNU C Library: Formatted Output Functions</a>: <code>printf</code> y funciones relacionadas.</li>
+              <li><a href="https://sourceware.org/glibc/manual/2.34/html_node/Formatted-Input.html">GNU C Library: Formatted Input</a>: <code>scanf</code> y entrada formateada.</li>
+              <li><a href="https://sourceware.org/glibc/manual/latest/html_node/String-Length.html">GNU C Library: String Length</a>: <code>strlen</code> y longitud de strings.</li>
+              <li><a href="https://sourceware.org/glibc/manual/2.25/html_node/String_002fArray-Comparison.html">GNU C Library: String/Array Comparison</a>: <code>strcmp</code> y comparacion de strings.</li>
+              <li><a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Pointers.html">GNU C Language Manual: Pointers</a>: punteros, dereferencia, aritmetica y relacion con arreglos.</li>
+              <li><a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Arrays.html">GNU C Language Manual: Arrays</a>: arreglos y almacenamiento consecutivo.</li>
+            </ul>
+            <p class="footer">Nota: ISO define el lenguaje C, pero el texto completo del estandar es de pago. Por eso esta guia usa la pagina oficial de ISO para el estandar y manuales oficiales GNU/GCC para explicaciones accesibles.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const $ = (selector, scope = document) => scope.querySelector(selector);
+    const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
+
+    function copyCode(button) {
+      const box = button.closest(".codebox");
+      const code = $("code", box).innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const previous = button.textContent;
+        button.textContent = "Copiado";
+        setTimeout(() => {
+          button.textContent = previous;
+        }, 900);
+      });
+    }
+
+    $$(".copy").forEach((button) => {
+      button.addEventListener("click", () => copyCode(button));
+    });
+
+    $$(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const group = tab.closest(".body");
+        const target = tab.dataset.tab;
+        $$(".tab", group).forEach((item) => {
+          item.setAttribute("aria-selected", String(item === tab));
+        });
+        $$(".tab-panel", group).forEach((panel) => {
+          panel.classList.toggle("active", panel.id === target);
+        });
+      });
+    });
+
+    $("#expandAll").addEventListener("click", () => {
+      $$("details").forEach((detail) => detail.open = true);
+    });
+
+    $("#collapseAll").addEventListener("click", () => {
+      $$("details").forEach((detail) => detail.open = false);
+    });
+
+    const values = [10, 20, 30, 40, 50];
+    const baseAddress = 0x1000;
+    const intSize = 4;
+    const memoryRow = $("#memoryRow");
+
+    function hex(value) {
+      return "0x" + value.toString(16).toUpperCase();
+    }
+
+    function renderMemory(index) {
+      memoryRow.innerHTML = "";
+      values.forEach((value, i) => {
+        const cell = document.createElement("div");
+        cell.className = "cell" + (i === index ? " active" : "");
+        cell.innerHTML = `
+          <div class="expr">numeros[${i}]</div>
+          <div class="value">${value}</div>
+          <div class="addr">${hex(baseAddress + i * intSize)}</div>
+        `;
+        memoryRow.appendChild(cell);
+      });
+      $("#idxLabel").textContent = String(index);
+      $("#exprText").innerHTML = `<code>*(puntero + ${index})</code> lee <code>${values[index]}</code>.`;
+      $("#equivText").innerHTML = `<code>numeros[${index}]</code> es lo mismo que <code>*(puntero + ${index})</code>.`;
+      $("#addrText").innerHTML = `Si la direccion base fuera 0x1000 y cada int ocupa 4 bytes, <code>puntero + ${index}</code> seria <code>${hex(baseAddress + index * intSize)}</code>.`;
+    }
+
+    const idxRange = $("#idxRange");
+    idxRange.addEventListener("input", () => renderMemory(Number(idxRange.value)));
+    renderMemory(0);
+
+    $$(".question").forEach((question) => {
+      const answer = question.dataset.answer;
+      const answerBox = $(".answer", question);
+      $$("button[data-choice]", question).forEach((button) => {
+        button.addEventListener("click", () => {
+          const ok = button.dataset.choice === answer;
+          answerBox.className = "answer " + (ok ? "ok" : "no");
+          answerBox.textContent = ok
+            ? "Correcto. Esa es la idea que debes automatizar mentalmente."
+            : "No. Revisa el ejemplo de la seccion correspondiente y vuelve a intentarlo.";
+        });
+      });
+    });
+
+    const sections = $$("section");
+    const navLinks = $$("#nav a");
+
+    function updateActiveNav() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 120;
+      sections.forEach((section) => {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      });
+      navLinks.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === "#" + current);
+      });
+
+      const scrollMax = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollMax > 0 ? (window.scrollY / scrollMax) * 100 : 0;
+      $("#readProgress").style.width = `${Math.max(0, Math.min(100, progress))}%`;
+    }
+
+    window.addEventListener("scroll", updateActiveNav, { passive: true });
+    updateActiveNav();
+
+    $("#search").addEventListener("input", (event) => {
+      const term = event.target.value.trim().toLowerCase();
+      sections.forEach((section) => {
+        const haystack = (section.innerText + " " + (section.dataset.search || "")).toLowerCase();
+        section.classList.toggle("hidden-by-search", term.length > 0 && !haystack.includes(term));
+      });
+    });
+  </script>
+</body>
+</html>
