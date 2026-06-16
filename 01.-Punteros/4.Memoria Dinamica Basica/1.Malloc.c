@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int *p = malloc(sizeof(int));
+
+    if (p == NULL) {
+        printf("Error: no se pudo reservar memoria.\n");
+        return 1;
+    }
+
+    *p = 50;
+
+    printf("Valor guardado en memoria dinamica: %d\n", *p);
+    printf("Direccion guardada en p: %p\n", (void *)p);
+
+    free(p);
+    p = NULL;
+
+    return 0;
+}
