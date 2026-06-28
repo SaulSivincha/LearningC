@@ -1,24 +1,33 @@
-#include <stdio.h> 
+#include <stdio.h>
 #include <stdlib.h>
 
 int main () {
-    int cantidad = 5;
-    int *p = malloc(cantidad * sizeof(int));
+    int sizeInt;
+
+    printf("Cantidad de enteros: ");
+    scanf("%d", &sizeInt);
+
+    int *p = malloc(sizeof(*p * sizeInt));
+
     if (p == NULL) {
-        printf("NO se pudo reservar memoria en el heap");
-        return 1;
+        printf("Memoria llena");
     }
 
-    for (int i = 0; i < cantidad; i++) {
-        p[i] = i + 1;
+    printf("Ingrese los valores \n");
+    for (int i = 0; i < sizeInt; i++) {
+        printf("Valor %d:", i + 1);
+        scanf("%d", p + i);
     }
 
-    for (int i = 0; i < cantidad; i++) {
-        printf("%d\n:",  (*p + i));
+    int suma = 0;
+    float promedio = 0.0;
+
+    for(int i = 0; i < sizeInt; i++) {
+        suma += *(p + i);
     }
 
-    free(p);
-    p = NULL;
+    promedio = (float)suma / sizeInt;
 
-    return 0;
+    printf("Promedio: %f\n", promedio);
+    printf("Suma: %d\n", suma);
 }
