@@ -7,7 +7,7 @@ int main () {
     printf("Cantidad de enteros: ");
     scanf("%d", &sizeInt);
 
-    int *p = malloc(sizeof(*p * sizeInt));
+    int *p = malloc(sizeof *p * sizeInt);
 
     if (p == NULL) {
         printf("Memoria llena");
@@ -30,4 +30,7 @@ int main () {
 
     printf("Promedio: %f\n", promedio);
     printf("Suma: %d\n", suma);
+
+    free(p);
+    p = NULL;
 }
