@@ -14,4 +14,6 @@ int main () {
     printf("Bateria antes del consumo: %.2f\n", bateria);
     modificarBateria(consumo, &bateria);
     printf("Bateria despues del consumo: %.2f\n", bateria);   
+
+    return 0;
 }
