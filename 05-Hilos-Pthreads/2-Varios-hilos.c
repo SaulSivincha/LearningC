@@ -3,14 +3,17 @@
 
 void *trabajo1(void *arg) {
     printf("Hola desde el hilo 1\n");
+    return NULL;
 }
 
 void *trabajo2(void *arg) {
     printf("Hola desde el hilo 2\n");
+    return NULL;
 }
 
 void *trabajo3(void *arg) {
     printf("Hola desde el hilo 3\n");
+    return NULL;
 }
 
 int main(void) {
@@ -18,27 +21,20 @@ int main(void) {
     pthread_t hilo2;
     pthread_t hilo3;
 
-    int resultado1 = pthread_create(&hilo1, NULL, trabajo1, NULL);
-    if (resultado1 != 0){
-        printf("Error al crear el hilo1\n");
-    }
-    printf("Termino el hilo 1 \n");
+    pthread_create(&hilo1, NULL, trabajo1, NULL);
+    pthread_create(&hilo2, NULL, trabajo2, NULL);
+    pthread_create(&hilo3, NULL, trabajo3, NULL);
+
     pthread_join(hilo1, NULL);
+    printf("Terminó el hilo 1\n");
 
-    int resultado2 = pthread_create(&hilo2, NULL, trabajo2, NULL);
-    if (resultado2 != 0){
-        printf("Error al crear el hilo2\n");
-    }
-    printf("Termino el hilo 2 \n");
     pthread_join(hilo2, NULL);
+    printf("Terminó el hilo 2\n");
 
-    int resultado3 = pthread_create(&hilo3, NULL, trabajo3, NULL);
-    if (resultado3 != 0){
-        printf("Error al crear el hilo3\n");
-    }
-    printf("Termino el hilo 3 \n");
     pthread_join(hilo3, NULL);
+    printf("Terminó el hilo 3\n");
 
     printf("Todos los hilos terminaron\n");
+
     return 0;
 }
